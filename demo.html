@@ -20,9 +20,10 @@
 
 
 <div id="mapid" style="width: 80vw; height: 80vh;"></div>
+
+
+
 <script>
-
-
 	var mymap = L.map('mapid',{
 		minZoom: 0,
 		maxZoom: 18,
@@ -40,18 +41,23 @@
 	}).addTo(mymap);
 
 
-
 my_url = "./input/capabilitystatements/org1-trans1.json";
 var my_json;
+var contained_org_id;
+
 $.getJSON(my_url, function(json) {
-  my_json = json;
-  latitude  = fhirpath.evaluate(my_json, "contained.first().address.extension('http://hl7.org/fhir/StructureDefinition/geolocation').extension('latitude').valueDecimal")[0];
-  longitude = fhirpath.evaluate(my_json, "contained.first().address.extension('http://hl7.org/fhir/StructureDefinition/geolocation').extension('longitude').valueDecimal")[0];
-// contained.first() should be: contained.where(id=%resource.implementation.custodian.reference.substring(1,999))
+
+//  latitude  = fhirpath.evaluate(json, "contained.first().address.extension('http://hl7.org/fhir/StructureDefinition/geolocation').extension('latitude').valueDecimal")[0];
+//  longitude = fhirpath.evaluate(json, "contained.first().address.extension('http://hl7.org/fhir/StructureDefinition/geolocation').extension('longitude').valueDecimal")[0];
+  
+  contained_org_id = fhirpath.evaluate(json, "implementation.custodian.reference.substring(1,999)")[0];
+  
+  latitude = fhirpath.evaluate(json, "contained.where(id=%contained_org_id).address.extension('http://hl7.org/fhir/StructureDefinition/geolocation').extension('latitude').valueDecimal", {contained_org_id: contained_org_id})[0];
+  longitude = fhirpath.evaluate(json, "contained.where(id=%contained_org_id).address.extension('http://hl7.org/fhir/StructureDefinition/geolocation').extension('longitude').valueDecimal", {contained_org_id: contained_org_id})[0];
+
 
   L.marker([latitude, longitude]).addTo(mymap)
-		.bindPopup("<b>Hallo wereld!</b><br />Ik ben ook een pop-up.");
-// this should be updated from the capStatement
+		.bindPopup("<b>Hallo wereld!</b><br />Ik bmymapen ook een pop-up.");
 
 });
 
@@ -59,6 +65,9 @@ $.getJSON(my_url, function(json) {
 
 	L.marker([41.139914, -8.61]).addTo(mymap)
 		.bindPopup("<b>Hello world!</b><br />I am a popup.").openPopup();
+
+
+
 
 	L.circle([41.134542, -8.604402], 100, {
 		color: 'red',
@@ -86,3 +95,7 @@ $.getJSON(my_url, function(json) {
 
 </script>
 
+
+</body>
+
+</html>
